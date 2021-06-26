@@ -27,11 +27,13 @@ class Grid:
     Draws the grid on the pygame window
     """
     def draw(self):
+        # Draws white background
+
         # Draws the grid lines
         for y in range(self.rows):
             pygame.draw.line(self.win, Color.GREY, (0, y * self.gap), (self.width, y * self.gap))
             for x in range(self.rows):
-                pygame.draw.line(self.win, GREY, (x * self.gap, 0), (x * self.gap, self.width))
+                pygame.draw.line(self.win, Color.GREY, (x * self.gap, 0), (x * self.gap, self.width))
 
         # Draws the spots
         for row in self.grid:
@@ -48,7 +50,7 @@ class Grid:
         for row in self.grid:
             for spot in row:
                 if spot.color != Color.TURQUOISE and spot.color != Color.BLACK and spot.color != Color.ORANGE:
-                    spot.color = Color.WHITE
+                    spot.reset()
 
     """
     Clear the start/end anchors
@@ -57,4 +59,14 @@ class Grid:
         for row in self.grid:
             for spot in row:
                 if spot.color == Color.TURQUOISE or spot.color == Color.ORANGE:
-                    spot.color = Color.WHITE
+                    spot.reset()
+
+    """
+    Clears all spots --> white
+    """
+    def clearAll(self):
+        for row in self.grid:
+            for spot in row:
+                spot.reset();
+
+    

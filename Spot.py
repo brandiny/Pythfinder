@@ -13,7 +13,7 @@ class Spot:
 
         self.width = width
         self.total_rows = total_rows
-        self.color = Color.BLACK        # Default spot color
+        self.color = Color.BLUE        # Default spot color
         self.neighbors = []             # List of nearby Spot objects
 
     """
@@ -44,7 +44,7 @@ class Spot:
 
     """ Reset the square to white? """
     def reset(self):
-        return self.color == Color.WHITE
+        self.color = Color.WHITE
 
     """ Make the spot to be visited """
     def make_open(self):
@@ -71,7 +71,7 @@ class Spot:
     """
     def draw(self):
         pygame.draw.rect(self.win, self.color, (self.x, self.y, self.width, self.width))
-    
+        
 
     """
     Updates the square's neighbors field, so that the VALID neighbors are added.
