@@ -49,6 +49,10 @@ class Spot:
     """ Make the spot to be visited """
     def makeOpen(self):
         self.color = Color.GREEN
+    
+    """ Make the spot already visited """
+    def makeClosed(self):
+        self.color = Color.RED
 
     """ Make the spot to be visited """
     def makeBarrier(self):
@@ -85,15 +89,15 @@ class Spot:
             self.neighbors.append(grid[self.row + 1][self.col])
 
         # Check Up
-        if self.row > 0 and not grid[self.row - 1][self.col].is_barrier():
+        if self.row > 0 and not grid[self.row - 1][self.col].isBarrier():
             self.neighbors.append(grid[self.row - 1][self.col])
 
         # Check Right
-        if self.col < self.total_rows - 1 and not grid[self.row][self.col + 1].is_barrier():
+        if self.col < self.total_rows - 1 and not grid[self.row][self.col + 1].isBarrier():
             self.neighbors.append(grid[self.row][self.col + 1])
 
         # Check Left
-        if self.col > 0 and not grid[self.row][self.col - 1].is_barrier():
+        if self.col > 0 and not grid[self.row][self.col - 1].isBarrier():
             self.neighbors.append(grid[self.row][self.col - 1])
 
     

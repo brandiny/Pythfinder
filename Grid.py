@@ -26,6 +26,14 @@ class Grid:
             self.grid.append(row)
 
     """
+    Update neighbors on the grid
+    """
+    def updateSpotNeighbors(self):
+        for row in self.grid:
+            for spot in row:
+                spot.updateNeighbors(self.grid)
+
+    """
     Draws the grid on the pygame window
     """
     def draw(self):
