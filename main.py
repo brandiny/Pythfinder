@@ -18,12 +18,23 @@ end = None              # The end spot pointer
 run = True 
 grid = Grid(WINDOW, ROWS, WIDTH)
 
+# Handling the event function
+def handleEvents():
+    global run
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+            
+        if pygame.mouse.get_pressed()[0]:
+            spot = grid.getSpot(pygame.mouse.get_pos())
+            spot.makeBarrier()
+
+
 if __name__ == "__main__":
     while run:
         grid.draw()
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
+        handleEvents()
+
+       
 
         

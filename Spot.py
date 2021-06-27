@@ -13,7 +13,7 @@ class Spot:
 
         self.width = width
         self.total_rows = total_rows
-        self.color = Color.BLUE        # Default spot color
+        self.color = Color.WHITE        # Default spot color
         self.neighbors = []             # List of nearby Spot objects
 
     """
@@ -47,23 +47,23 @@ class Spot:
         self.color = Color.WHITE
 
     """ Make the spot to be visited """
-    def make_open(self):
+    def makeOpen(self):
         self.color = Color.GREEN
 
     """ Make the spot to be visited """
-    def make_barrier(self):
+    def makeBarrier(self):
         self.color = Color.BLACK
 
     """ Make the spot to be start """
-    def make_start(self):
+    def makeStart(self):
         self.color = Color.ORANGE
 
     """ Make the spot to be end """
-    def make_end(self):
+    def makeEnd(self):
         self.color = Color.TURQUOISE
 
     """ Make the spot to be final path """
-    def make_path(self):
+    def makePath(self):
         self.color = Color.PURPLE
 
     """
@@ -97,7 +97,8 @@ class Spot:
             self.neighbors.append(grid[self.row][self.col - 1])
 
     
-    
+
+
     
 
 

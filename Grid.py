@@ -12,6 +12,8 @@ class Grid:
         self.gap  = width // rows
         self.rows = rows
         self.width = width
+        self.fillGrid()
+
         
     """
     Remake the self.grid
@@ -27,18 +29,19 @@ class Grid:
     Draws the grid on the pygame window
     """
     def draw(self):
-        # Draws white background
-
+        # Draws the spots
+        for row in self.grid:
+            for spot in row:
+                spot.draw()
+                
+                
         # Draws the grid lines
         for y in range(self.rows):
             pygame.draw.line(self.win, Color.GREY, (0, y * self.gap), (self.width, y * self.gap))
             for x in range(self.rows):
                 pygame.draw.line(self.win, Color.GREY, (x * self.gap, 0), (x * self.gap, self.width))
 
-        # Draws the spots
-        for row in self.grid:
-            for spot in row:
-                spot.draw()
+       
 
         # Update - move to main eventually
         pygame.display.update()
@@ -68,5 +71,22 @@ class Grid:
         for row in self.grid:
             for spot in row:
                 spot.reset();
+
+    """
+    Returns the R, C --> given X, Y
+    """
+    def getClickPosition(self, xytuple, rows, width):
+        gap = width // rows
+        y, x = xytuple
+        row = y // gap
+        col = x // gap
+        return row, col
+
+    """
+    Get the spot at this x/y position
+    """
+    def getSpot(self, xytuple):
+        row, col = self.getClickPosition(xytuple, self.rows, self.width)
+        return self.grid[row][col]
 
     
