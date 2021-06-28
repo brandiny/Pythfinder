@@ -4,3 +4,6 @@ venv/
 # Python compiled cache
 __pycache__/
 
+# Vscode folder
+.vscode/
+
