@@ -1,6 +1,6 @@
 # Python environment code
-./venv
+venv/
 
 # Python compiled cache
-./__pycache__
+__pycache__/
 
