@@ -11,8 +11,8 @@ from Spot import Spot
 os.environ['SDL_VIDEO_CENTERED'] = '1' 
 
 # Program Constants
-WIDTH  = 500
-ROWS = 25
+WIDTH  = 800
+ROWS =  400
 WINDOW = pygame.display.set_mode((WIDTH, WIDTH))
 
 # Dynamic variables
@@ -67,6 +67,15 @@ def handleEvents():
                 grid.clearWorking()
                 grid.updateSpotNeighbors()
                 Mazegen.randomDFSMaze(grid, start, end, lambda : grid.draw());
+                
+                Pathfind.solveMazeAStar(grid, start, end, lambda : grid.draw());
+                grid.printEfficiency()
+
+                pygame.time.wait(1000)
+                grid.clearAll()
+                
+                Pathfind.solveMazeBFS(grid, start, end, lambda : grid.draw());
+                grid.printEfficiency()
 
                 
 if __name__ == "__main__":

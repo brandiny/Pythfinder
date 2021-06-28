@@ -32,6 +32,10 @@ class Spot:
     """ Is the spot unvisited? """
     def isOpen(self):
         return self.color == Color.GREEN
+
+    """ Is the spot a path? """
+    def isPath(self):
+        return self.color == Color.PURPLE
     
     """ Is the spot a barrier? """
     def isBarrier(self):

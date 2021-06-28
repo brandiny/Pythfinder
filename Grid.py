@@ -20,6 +20,7 @@ class Grid:
     Remake the self.gridlines
     """ 
     def fillGridLines(self):
+        self.gridlines = []
         for r in range(self.rows):
             row = []
             for c in range(self.rows):
@@ -31,6 +32,7 @@ class Grid:
     Remake the self.grid
     """
     def fillGrid(self):
+        self.grid = []
         for r in range(self.rows):
             row = []
             for c in range(self.rows):
@@ -116,4 +118,18 @@ class Grid:
         row, col = self.getClickPosition(xytuple, self.rows, self.width)
         return self.grid[row][col]
 
+    """
+    Prints the efficiency of the algorithm (searched spaces vs path)
+    """
+    def printEfficiency(self):
+        totalRed = 0
+        totalPath = 0
+        for r in self.grid:
+            for spot in r:
+                if spot.isClosed():
+                    totalRed += 1
+                elif spot.isPath():
+                    totalPath += 1
+        
+        print("Efficiency: " + str(round(100 * totalPath / (totalRed + totalPath))) + "%")
     
