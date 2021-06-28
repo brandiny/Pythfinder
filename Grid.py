@@ -8,11 +8,23 @@ class Grid:
     """
     def __init__(self, win, rows, width):
         self.win = win
-        self.grid = []
         self.gap  = width // rows
         self.rows = rows
         self.width = width
+        self.grid = []
         self.fillGrid()
+        self.gridlines = []
+        self.fillGridLines()
+        
+    """
+    Remake the self.gridlines
+    """ 
+    def fillGridLines(self):
+        for r in range(self.rows):
+            row = []
+            for c in range(self.rows):
+                row.append({"drawY" : True, "drawX" : True})
+            self.gridlines.append(row)
 
         
     """
@@ -44,18 +56,17 @@ class Grid:
                 
                 
         # Draws the grid lines
-        for y in range(self.rows):
-            pygame.draw.line(self.win, Color.GREY, (0, y * self.gap), (self.width, y * self.gap))
-            for x in range(self.rows):
-                pygame.draw.line(self.win, Color.GREY, (x * self.gap, 0), (x * self.gap, self.width))
+        # for y in range(self.rows):
+        #     pygame.draw.line(self.win, Color.GREY, (0, y * self.gap), (self.width, y * self.gap))
+        #     for x in range(self.rows):
+        #         pygame.draw.line(self.win, Color.GREY, (x * self.gap, 0), (x * self.gap, self.width))
 
-        # for y in range(self.rows - 1):
-        #     for x in range(self.rows - 1):
-        #         if not (self.grid[y][x].isClosed() and self.grid[y+1][x].isClosed()):
-        #             pygame.draw.line(self.win, Color.GREY, (x * self.gap, y * self.gap), ((x + 1) * self.gap, y * self.gap))
-                
-        #         if not (self.grid[y][x].isClosed() and self.grid[y][x+1].isClosed()):
-        #             pygame.draw.line(self.win, Color.GREY, (x * self.gap, y * self.gap), (x * self.gap, (y + 1) * self.gap))
+        for y in range(self.rows):
+            for x in range(self.rows):  
+                if self.gridlines[y][x]["drawX"]:
+                    pygame.draw.line(self.win, Color.GREY, (x * self.gap, y * self.gap), ((x + 1) * self.gap, y * self.gap))
+                if self.gridlines[y][x]["drawY"]:
+                    pygame.draw.line(self.win, Color.GREY, (x * self.gap, y * self.gap), (x * self.gap, (y + 1) * self.gap))
 
        
 
