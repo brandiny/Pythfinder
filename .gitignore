@@ -1,0 +1,6 @@
+# Python environment code
+./venv
+
+# Python compiled cache
+./__pycache__
+
