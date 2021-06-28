@@ -49,6 +49,14 @@ class Grid:
             for x in range(self.rows):
                 pygame.draw.line(self.win, Color.GREY, (x * self.gap, 0), (x * self.gap, self.width))
 
+        # for y in range(self.rows - 1):
+        #     for x in range(self.rows - 1):
+        #         if not (self.grid[y][x].isClosed() and self.grid[y+1][x].isClosed()):
+        #             pygame.draw.line(self.win, Color.GREY, (x * self.gap, y * self.gap), ((x + 1) * self.gap, y * self.gap))
+                
+        #         if not (self.grid[y][x].isClosed() and self.grid[y][x+1].isClosed()):
+        #             pygame.draw.line(self.win, Color.GREY, (x * self.gap, y * self.gap), (x * self.gap, (y + 1) * self.gap))
+
        
 
         # Update - move to main eventually
@@ -60,7 +68,7 @@ class Grid:
     def clearWorking(self):
         for row in self.grid:
             for spot in row:
-                if spot.color != Color.TURQUOISE and spot.color != Color.BLACK and spot.color != Color.ORANGE:
+                if spot.color == Color.GREEN or spot.color == Color.RED or spot.color == Color.PURPLE:
                     spot.reset()
 
     """

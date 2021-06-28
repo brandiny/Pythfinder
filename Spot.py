@@ -16,6 +16,9 @@ class Spot:
         self.color = Color.WHITE        # Default spot color
         self.neighbors = []             # List of nearby Spot objects
 
+        self.cost = 0
+        self.weight = 0
+
     """
     Returns the row, col position as an unpackable tuple (row, col)
     """
@@ -70,6 +73,10 @@ class Spot:
     def makePath(self):
         self.color = Color.PURPLE
 
+    """ Make the spot a particular color """
+    def setColor(self, colortuple):
+        self.color = colortuple
+
     """
     Draws the square on the screen at position (x,y) with width=height=self.width
     """
@@ -84,21 +91,34 @@ class Spot:
     def updateNeighbors(self, grid):
         self.neighbors = []
 
-        # Check Down
-        if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].isBarrier():
-            self.neighbors.append(grid[self.row + 1][self.col])
-
         # Check Up
         if self.row > 0 and not grid[self.row - 1][self.col].isBarrier():
             self.neighbors.append(grid[self.row - 1][self.col])
-
+        
         # Check Right
         if self.col < self.total_rows - 1 and not grid[self.row][self.col + 1].isBarrier():
             self.neighbors.append(grid[self.row][self.col + 1])
 
+        # Check Down
+        if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].isBarrier():
+            self.neighbors.append(grid[self.row + 1][self.col])
+
         # Check Left
         if self.col > 0 and not grid[self.row][self.col - 1].isBarrier():
             self.neighbors.append(grid[self.row][self.col - 1])
+
+
+    """
+    Less than function, 
+    """
+    def __lt__(self, other):
+        return self.cost < other.cost
+
+        
+
+        
+
+        
 
     
 

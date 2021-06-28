@@ -1,6 +1,8 @@
 import pygame, os
 import math
-import Algos
+
+import Pathfind
+import Mazegen
 from Grid import Grid
 from Spot import Spot
     
@@ -10,7 +12,7 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 # Program Constants
 WIDTH  = 500
-ROWS = 10
+ROWS = 25
 WINDOW = pygame.display.set_mode((WIDTH, WIDTH))
 
 # Dynamic variables
@@ -43,6 +45,12 @@ def handleEvents():
                 end.makeEnd()
 
             elif spot != end and spot != start:
+                spot.weight += 1
+                weight = spot.weight
+                r, g, b = 255, 255, 255
+                r, g, b = max(0, r - weight*20), max(0, g - weight*20), max(0, b - weight*20)
+
+                # spot.setColor((r, g, b))
                 spot.makeBarrier()
 
         # RMB
@@ -53,18 +61,19 @@ def handleEvents():
             start = None if spot == start else start
             end = None if spot == end else end
 
-         # 
+        # 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 grid.clearWorking()
                 grid.updateSpotNeighbors()
-                Algos.breadthFirstSearch(grid, start, end, lambda : grid.draw());
+                Mazegen.randomDFSMaze(grid, start, end, lambda : grid.draw());
 
                 
 if __name__ == "__main__":
     while run:
         grid.draw()
         handleEvents()
+
 
        
 
