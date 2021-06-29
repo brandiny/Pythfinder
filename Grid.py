@@ -56,13 +56,7 @@ class Grid:
             for spot in row:
                 spot.draw()
                 
-                
-        # Draws the grid lines
-        # for y in range(self.rows):
-        #     pygame.draw.line(self.win, Color.GREY, (0, y * self.gap), (self.width, y * self.gap))
-        #     for x in range(self.rows):
-        #         pygame.draw.line(self.win, Color.GREY, (x * self.gap, 0), (x * self.gap, self.width))
-
+        # Draws the gridlines over top
         for y in range(self.rows):
             for x in range(self.rows):  
                 if self.gridlines[y][x]["drawX"]:
@@ -71,7 +65,6 @@ class Grid:
                     pygame.draw.line(self.win, Color.GREY, (x * self.gap, y * self.gap), (x * self.gap, (y + 1) * self.gap))
 
        
-
         # Update - move to main eventually
         pygame.display.update()
 

@@ -2,18 +2,21 @@ import pygame
 import random
 from Spot import Spot
 
-
-def randomUnvisitedNeighbor(spot):
+"""
+Given a spot, return a random neighbor from its neighbors. If no possible options none
+"""
+def randomUnvisitedNeighbor(spot) -> Spot:
     neighbors = [spot for spot in spot.neighbors if not spot.isClosed()]
     if not neighbors:
         return None
     else:
         return random.choice(neighbors)
-  
 
-last = Spot(None, -1, 0, 1, 1)
+"""
+Generates a random maze given a grid object
+"""
 def randomDFSMaze(grid, start, end, draw):
-    global last
+    last = Spot(None, -1, 0, 1, 1)
     grid.fillGridLines()
     start = grid.grid[0][0]
 
@@ -53,10 +56,10 @@ def randomDFSMaze(grid, start, end, draw):
             grid.gridlines[yi][xi]["drawX"] = False
         
         last = vertex
-        # draw()
+        draw()
     
     grid.clearAll()
-    draw()
+    # draw() 
   
 def randomBT(grid, start, end, draw):
     grid.fillGridLines()

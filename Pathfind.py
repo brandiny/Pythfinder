@@ -2,66 +2,89 @@ import pygame
 from queue import PriorityQueue
 from collections import deque
 
-def breadthFirstSearch(grid, start, end, draw):
-    queue = deque([])
-    queue.append(start)
+"""PATH FINDING ALGORITHMS SECTION"""
 
-    visited = set()
-    parent = dict()
+
+"""
+Finds the shortest path using BFS and paints the path
+
+grid --> Grid object
+start --> Spot object
+end --> Spot object
+draw --> draw() function object
+"""
+def breadthFirstSearch(grid, start, end, draw):
+    queue = deque([])                   # Processes nodes in a FIFO manner
+    queue.append(start)     
+
+    visited = set()                     # Only process !visited nodes
+    parent = dict()                     # parent[node] = where the node came from
 
     while queue:
         current = queue.popleft()       # Grab the next spot in line to be processed
-        visited.add(current)            # Make sure it is not visited again
+        visited.add(current)            # Mark as visited
         
-        # In the event it is not start or end - make it negative
+        # In the event it is not start or end - make closed (nothing is there)
         if current != start and current != end:
             current.makeClosed()
 
+        # If it is the end, then draw the path and break out.
         elif current == end:
             path = getPath(start, end, parent)
             for p in path:
                 p.makePath()
-
             end.makeEnd()
             start.makeStart()
-            break
+            return
             
-        
+        # Then, add all valid neighbors (unvisited ones) to the queue to be processed.
+        # Notice we add them to visited, so that the BFS algorithm doesn't overlap
         for n in current.neighbors:
             if n not in visited:
                 if n != end:
                     n.makeOpen()
                 queue.append(n)
-                visited.add(n)
+                visited.add(n)          
                 parent[n] = current
-    
+        
+        # Redraw - comment out for performance - uncomment for interactive
         draw()
 
+"""
+Finds a possible path (does not guarantee shortest path) with DFS
 
+grid --> Grid object
+start --> Spot object
+end --> Spot object
+draw --> draw() function object
+"""
 def depthFirstSearch(grid, start, end, draw):
-    stack = []
-    stack.append(start)
+    stack = []                          # Processes nodes in a LIFO manner so that its depth first
+    stack.append(start) 
 
-    visited = set()
-    parent = dict()
+    visited = set()                     # Tracks with nodes have been visited           
+    parent = dict()                     # parent[spot] = which spot this came from
 
     while stack:
-        current = stack.pop()           # Grab the next spot in line to be processed
+        # Grab the next spot in line to be processed
+        # Make sure its never visited again
+        current = stack.pop()           
+        visited.add(current)            
 
-        # In the event it is not start or end - make it negative
+        # If it isn't what we are looking for, mark it as closed
         if current != start and current != end:
-            visited.add(current)            # Make sure it is not visited again
             current.makeClosed()
-
+        
+        # If we find the end, we reconstruct the path and exit.
         elif current == end:
             path = getPath(start, end, parent)
             for p in path:
                 p.makePath()
-
             end.makeEnd()
             start.makeStart()
-            break
+            return
     
+        # Otherwise, we add all valid, unvisited neighbors to the stack
         for n in current.neighbors:
             if n not in visited:
                 if n != end:
@@ -69,72 +92,101 @@ def depthFirstSearch(grid, start, end, draw):
                 stack.append(n)
                 parent[n] = current
     
+        # Comment for performance - live drawing function
         draw()
 
+"""
+Finds a the shortest path with A*
 
+grid --> Grid object
+start --> Spot object
+end --> Spot object
+draw --> draw() function object
+"""
 def aStarSearch(grid, start, end, draw):
-    count = 0
+    count = 0                           # Used for breaking ties where F score is    
+    openSet = PriorityQueue()           # Priority Queue based on first element of tuple
+    openSet.put((0, count, start))      # (FScore, Tiebreak_count, spot object)
+    parent = {}                         # parent[spot] = where spot came from (returns spot)
 
-    openSet = PriorityQueue()       
-    openSet.put((0, count, start))
-
-    parent = {}
-
+    # G Score = the SHORTEST known distance to arrive at given spot from start
+    # gScore[start] = 0, as it is already at start
+    # Initialise all other G Scores at infinity because we don't know the path yet
     gScore = {spot: float('inf') for row in grid.grid for spot in row}
     gScore[start] = 0
 
+    # F Score = G Score + H Score
+    # H Score = 'estimated' distance to the end node from the current node with heuristic
+    # Therefore F score is total cost to arrive at end.
     fScore = {spot: float('inf') for row in grid.grid for spot in row}
     fScore[start] = hScore(start.getPosition(), end.getPosition())
 
-    visited = {start}
+    visited = {start}                   # Tracks whether spots have been visited    
 
+   
     while not openSet.empty():
         current = openSet.get()[2]
         visited.remove(current)
 
-        # reconstruct path on finding the end point and BREAK
-        if current == end:
+        # If it is not equal to the end, we make it closed
+        if current != start and current != end:
+            current.makeClosed()
+
+        # If we find the end, reconstruct the path and exit
+        elif current == end:
             path = getPath(start, end, parent)
             for p in path:
                 p.makePath()
                 draw()
             end.makeEnd()
             start.makeStart()
-            break
+            return
 
+        # Otherwise, for each neighbor
         for n in current.neighbors:
+            # If the temp gScore (distance to this node from root from this path)
+            # is better than the best, update it and its F score
+            # Otherwise do nothing to this neighbor.
+            # Make sure it is unvisited too
             gScoreTemp = gScore[current] + 1
-            
             if (gScoreTemp < gScore[n]):
                 parent[n] = current
                 gScore[n] = gScoreTemp
                 fScore[n] = gScoreTemp + hScore(n.getPosition(), end.getPosition())
-                
+
                 if n not in visited:
                     count += 1
-
-                    # add to need to be visited (open) set and make it open color
                     openSet.put((fScore[n], count, n))
                     visited.add(n)
                     n.makeOpen()
 
+        # Live drawing, uncomment for better performance
         draw()
-        
-        if current != start and current != end:
-            current.makeClosed()
 
 
+"""MAZE PATH FINDING ALGORITHMS SECTION"""
+
+
+"""
+Solves the maze by searching breadth first, guarantees shortest path.
+
+grid --> Grid object
+start --> Spot object = DEFAULTING to top left corner
+end --> Spot object = DEFAULTING to bottom right corner
+draw --> draw() function object
+"""
 def solveMazeBFS(grid, start, end, draw):
+    # Defaulting start and end
     start = grid.grid[0][0]
     end = grid.grid[grid.rows - 1][grid.rows - 1]
     start.makeStart()
     end.makeEnd()
 
-    queue = deque([])
-    queue.append(start)
+    queue = deque([])                   # FIFO - join queue from appendright
+    queue.append(start)     
 
-    visited = set()
-    parent = dict()
+    visited = set()                     # Only process !visited nodes
+    parent = dict()                     # parent[node] = where the node came from
 
     while queue:
         current = queue.popleft()       # Grab the next spot in line to be processed
@@ -144,6 +196,7 @@ def solveMazeBFS(grid, start, end, draw):
         if current != start and current != end:
             current.makeClosed()
 
+        # If it is the end, then draw the path and break out.
         elif current == end:
             path = getPath(start, end, parent)
             for p in path:
@@ -152,133 +205,158 @@ def solveMazeBFS(grid, start, end, draw):
             end.makeEnd()
             start.makeStart()
             break
-            
+        
+        # Then, add all valid neighbors (unvisited ones) to the queue to be processed.
+        # Notice we add them to visited, so that the BFS algorithm doesn't overlap
         for n in current.neighbors:
-            xi, yi = current.getPosition()
-            xf, yf = n.getPosition()
-            
-            # If you cross into the RIGHT, don't draw the left handside Y handle
-            if xf - xi == 1 and yf - yi == 0 and grid.gridlines[yf][xf]["drawY"]:
-                continue
-
-            # If you cross into the LEFT, don't draw the last right handside Y handle
-            elif xf - xi == -1 and yf - yi == 0 and grid.gridlines[yi][xi]["drawY"]:
-                continue
-
-            # Down
-            elif xf - xi == 0 and yf - yi == 1 and grid.gridlines[yf][xf]["drawX"]:
-                continue
-
-            # Up
-            elif xf - xi == 0 and yf - yi == -1 and grid.gridlines[yi][xi]["drawX"]:
-                continue
-            
-            # If unvisited, mark to be visited by algorithm
-            if n not in visited:
-                if n != end:
-                    n.makeOpen()
+            # If unvisited and doesn't cross a wall when you get to it.
+            if n not in visited and not hitsWall(grid, current, n):
+                n.makeOpen()
                 queue.append(n)
                 visited.add(n)
                 parent[n] = current
-    
-    draw()
+
+        # Draw for live performance
+        draw()
 
 
+"""
+Solves the maze by searching with A* , guarantees shortest path.
+
+grid --> Grid object
+start --> Spot object = DEFAULTING to top left corner
+end --> Spot object = DEFAULTING to bottom right corner
+draw --> draw() function object
+"""
 def solveMazeAStar(grid, start, end, draw):
-    start = grid.grid[0][0]
-    end = grid.grid[grid.rows - 1][grid.rows - 1]
-    start.makeStart()
-    end.makeEnd()
+    count = 0                           # Used for breaking ties where F score is    
+    openSet = PriorityQueue()           # Priority Queue based on first element of tuple
+    openSet.put((0, count, start))      # (FScore, Tiebreak_count, spot object)
+    parent = {}                         # parent[spot] = where spot came from (returns spot)
 
-    # Begin A star
-    count = 0
-
-    openSet = PriorityQueue()       
-    openSet.put((0, count, start))
-
-    parent = {}
-
+    # G Score = the SHORTEST known distance to arrive at given spot from start
+    # gScore[start] = 0, as it is already at start
+    # Initialise all other G Scores at infinity because we don't know the path yet
     gScore = {spot: float('inf') for row in grid.grid for spot in row}
     gScore[start] = 0
 
+    # F Score = G Score + H Score
+    # H Score = 'estimated' distance to the end node from the current node with heuristic
+    # Therefore F score is total cost to arrive at end.
     fScore = {spot: float('inf') for row in grid.grid for spot in row}
     fScore[start] = hScore(start.getPosition(), end.getPosition())
 
-    visited = {start}
+    visited = {start}                   # Tracks whether spots have been visited    
 
+   
     while not openSet.empty():
         current = openSet.get()[2]
         visited.remove(current)
 
-        # reconstruct path on finding the end point and BREAK
-        if current == end:
+        # If it is not equal to the end, we make it closed
+        if current != start and current != end:
+            current.makeClosed()
+
+        # If we find the end, reconstruct the path and exit
+        elif current == end:
             path = getPath(start, end, parent)
             for p in path:
                 p.makePath()
-            
+                draw()
             end.makeEnd()
             start.makeStart()
-            break
+            return
 
+        # Otherwise, for each neighbor
         for n in current.neighbors:
-            xi, yi = current.getPosition()
-            xf, yf = n.getPosition()
-            
-            # If you cross into the RIGHT, don't draw the left handside Y handle
-            if xf - xi == 1 and yf - yi == 0 and grid.gridlines[yf][xf]["drawY"]:
+            # If the neighbor is blocked by a wall, do nothing
+            if hitsWall(grid, current, n):
                 continue
 
-            # If you cross into the LEFT, don't draw the last right handside Y handle
-            elif xf - xi == -1 and yf - yi == 0 and grid.gridlines[yi][xi]["drawY"]:
-                continue
-
-            # Down
-            elif xf - xi == 0 and yf - yi == 1 and grid.gridlines[yf][xf]["drawX"]:
-                continue
-
-            # Up
-            elif xf - xi == 0 and yf - yi == -1 and grid.gridlines[yi][xi]["drawX"]:
-                continue
+            # Otherwise If the temp gScore (distance to this node from root from this path)
+            # is better than the best, update it and its F score
+            # Otherwise do nothing to this neighbor.
+            # Make sure it is unvisited too
             gScoreTemp = gScore[current] + 1
-            
             if (gScoreTemp < gScore[n]):
                 parent[n] = current
                 gScore[n] = gScoreTemp
                 fScore[n] = gScoreTemp + hScore(n.getPosition(), end.getPosition())
-                
+
                 if n not in visited:
                     count += 1
-
-                    # add to need to be visited (open) set and make it open color
                     openSet.put((fScore[n], count, n))
                     visited.add(n)
                     n.makeOpen()
 
-        #draw()
-        
-        if current != start and current != end:
-            current.makeClosed()
+        draw()
     
-    draw()
+
+""" HELPER SUPPORT FUNCTIONS BELOW """
 
 
-def getPath(start, end, parentDictionary):
+"""
+Returns a list of the path from start to finish
+
+start: starting Spot node
+end: ending Spot node
+parentDictionary: linked list of where each node came from
+"""
+def getPath(start, end, parentDictionary) -> list:
     path = []
-    pointer = end
+    pointer = end 
 
     # Essentially traversing a linkedlist where head=end
     while pointer != start:         
         path.append(pointer)
         pointer = parentDictionary[pointer]
-
-    return path[::-1]
+    
+    # List is reversed because we add it in reverse order.
+    return path[::-1] 
     
 
+"""
+Returns the estimated distance between two points via euclidean d
+
+start: starting Spot node
+end: ending Spot node
+parentDictionary: linked list of where each node came from
+"""
 def hScore(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
-    # return abs(x1 - x2) + abs(y1 - y2)
     return (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2)
+
+
+"""
+Returns whether or not initial -> final is between a wall.
+
+grid: Grid object
+initial: Spot object
+final: Spot object
+"""
+def hitsWall(grid, initial, final) -> bool:
+    xi, yi = initial.getPosition()
+    xf, yf = final.getPosition()
+
+    # If you cross into the RIGHT, don't draw the left handside Y handle
+    if xf - xi == 1 and yf - yi == 0 and grid.gridlines[yf][xf]["drawY"]:
+        return True
+
+    # If you cross into the LEFT, don't draw the last right handside Y handle
+    elif xf - xi == -1 and yf - yi == 0 and grid.gridlines[yi][xi]["drawY"]:
+        return True
+
+    # Down
+    elif xf - xi == 0 and yf - yi == 1 and grid.gridlines[yf][xf]["drawX"]:
+        return True
+
+    # Up
+    elif xf - xi == 0 and yf - yi == -1 and grid.gridlines[yi][xi]["drawX"]:
+        return True
+    
+    else:
+        return False
 
     
 
