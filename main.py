@@ -5,27 +5,33 @@ import Pathfind
 import Mazegen
 from Grid import Grid
 from Spot import Spot
-    
+from Controls import Controls
+
+# Fires up pygame
+pygame.init() 
 
 # Displays the window in center of page
 os.environ['SDL_VIDEO_CENTERED'] = '1' 
 
 # Program Constants
+CONTROL_PANEL_HEIGHT = 140
 WIDTH  = 500
 ROWS =  25
-WINDOW = pygame.display.set_mode((WIDTH, WIDTH))
+WINDOW = pygame.display.set_mode((WIDTH, WIDTH + CONTROL_PANEL_HEIGHT))
 
 # Dynamic variables
-start = None            # The start spot pointer
-end = None              # The end spot pointer
-run = True 
-grid = Grid(WINDOW, ROWS, WIDTH)
+run = True                          # Exit boolean for program
+grid = Grid(WINDOW, ROWS, WIDTH)    # Grid object that renders to the screeen
+controls = Controls(                # Control panel object that renders to the screen
+    WINDOW,
+    grid,
+    WIDTH,
+    CONTROL_PANEL_HEIGHT
+)
 
 # Handling the event function
 def handleEvents():
     global run
-    global start
-    global end
 
     for event in pygame.event.get():
         # Click on X
@@ -34,49 +40,55 @@ def handleEvents():
             
         # LMB
         if pygame.mouse.get_pressed()[0]:
-            spot = grid.getSpot(pygame.mouse.get_pos())
+            x, y = pygame.mouse.get_pos()
             
-            if not start and spot != end:
-                start = spot
-                start.makeStart()
+            # If clicking within the bounds of the grid
+            if x < WIDTH and y < WIDTH:
+                spot = grid.getSpot(pygame.mouse.get_pos())
 
-            elif not end and spot != start:
-                end = spot
-                end.makeEnd()
+                if not grid.start and spot != grid.end:
+                    grid.makeStart(spot)
 
-            elif spot != end and spot != start:
-                spot.weight += 1
-                weight = spot.weight
-                r, g, b = 255, 255, 255
-                r, g, b = max(0, r - weight*20), max(0, g - weight*20), max(0, b - weight*20)
+                elif not grid.end and spot != grid.start:
+                    grid.makeEnd(spot)
 
-                # spot.setColor((r, g, b))
-                spot.makeBarrier()
+                elif spot != grid.end and spot != grid.start:
+                    spot.makeBarrier()
+
+                    # spot.weight += 1
+                    # weight = spot.weight
+                    # r, g, b = 255, 255, 255
+                    # r, g, b = max(0, r - weight*20), max(0, g - weight*20), max(0, b - weight*20)
+            
+            # Otherwise the click lands within the control region
+            controls.handleClick(x, y)
 
         # RMB
         if pygame.mouse.get_pressed()[2]:
-            spot = grid.getSpot(pygame.mouse.get_pos())
-            spot.reset()
+            x, y = pygame.mouse.get_pos()
+            
+            # If clicking within the bounds of the grid
+            if x < WIDTH and y < WIDTH:
+                spot = grid.getSpot(pygame.mouse.get_pos())
+                grid.start = None if spot == grid.start else grid.start
+                grid.end = None if spot == grid.end else grid.end
+                spot.reset()
 
-            start = None if spot == start else start
-            end = None if spot == end else end
-
-        # 
+        # Key presses
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_s:
+                grid.makeMaze()
+
             if event.key == pygame.K_SPACE:
-                grid.clearWorking()
-                grid.updateSpotNeighbors()
-                # Pathfind.aStarSearch(grid, start, end, lambda : grid.draw())
-                Mazegen.randomDFSMaze(grid, start, end, lambda : grid.draw());
-                Pathfind.solveMazeBFS(grid, start, end, lambda : grid.draw());
-                # grid.printEfficiency()
+                grid.findPath()
 
                 
 if __name__ == "__main__":
     while run:
         grid.draw()
+        controls.draw()
         handleEvents()
-
+        pygame.display.update()
 
        
 

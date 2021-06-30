@@ -14,6 +14,10 @@ end --> Spot object
 draw --> draw() function object
 """
 def breadthFirstSearch(grid, start, end, draw):
+    isMaze = checkMaze(grid)            # Check if is maze
+    if start == None or end == None:    # Makes sure you can't accidentally call it
+        return
+    
     queue = deque([])                   # Processes nodes in a FIFO manner
     queue.append(start)     
 
@@ -40,15 +44,25 @@ def breadthFirstSearch(grid, start, end, draw):
         # Then, add all valid neighbors (unvisited ones) to the queue to be processed.
         # Notice we add them to visited, so that the BFS algorithm doesn't overlap
         for n in current.neighbors:
-            if n not in visited:
-                if n != end:
-                    n.makeOpen()
-                queue.append(n)
-                visited.add(n)          
-                parent[n] = current
+                if isMaze:
+                    if n not in visited and not hitsWall(grid, current, n):
+                        if n != end:
+                            n.makeOpen()
+                        queue.append(n)
+                        visited.add(n)          
+                        parent[n] = current
+                else:
+                    if n not in visited:
+                        if n != end:
+                            n.makeOpen()
+                        queue.append(n)
+                        visited.add(n)          
+                        parent[n] = current
         
         # Redraw - comment out for performance - uncomment for interactive
         draw()
+        pygame.display.update()
+    
 
 """
 Finds a possible path (does not guarantee shortest path) with DFS
@@ -59,6 +73,10 @@ end --> Spot object
 draw --> draw() function object
 """
 def depthFirstSearch(grid, start, end, draw):
+    isMaze = checkMaze(grid)            # Check if is maze
+    if start == None or end == None:    # Makes sure you can't accidentally call it
+        return
+
     stack = []                          # Processes nodes in a LIFO manner so that its depth first
     stack.append(start) 
 
@@ -86,14 +104,24 @@ def depthFirstSearch(grid, start, end, draw):
     
         # Otherwise, we add all valid, unvisited neighbors to the stack
         for n in current.neighbors:
-            if n not in visited:
-                if n != end:
-                    n.makeOpen()
-                stack.append(n)
-                parent[n] = current
+            if isMaze:
+                if n not in visited and not hitsWall(grid, current, n):
+                    if n != end:
+                        n.makeOpen()
+                    stack.append(n)
+                    parent[n] = current
+            else:
+                if n not in visited:
+                    if n != end:
+                        n.makeOpen()
+                    stack.append(n)
+                    parent[n] = current
     
         # Comment for performance - live drawing function
         draw()
+        pygame.display.update()
+    
+
 
 """
 Finds a the shortest path with A*
@@ -104,6 +132,10 @@ end --> Spot object
 draw --> draw() function object
 """
 def aStarSearch(grid, start, end, draw):
+    isMaze = checkMaze(grid)            # Check if is maze
+    if start == None or end == None:    # Makes sure you can't accidentally call it
+        return
+    
     count = 0                           # Used for breaking ties where F score is    
     openSet = PriorityQueue()           # Priority Queue based on first element of tuple
     openSet.put((0, count, start))      # (FScore, Tiebreak_count, spot object)
@@ -138,12 +170,16 @@ def aStarSearch(grid, start, end, draw):
             for p in path:
                 p.makePath()
                 draw()
+                pygame.display.update()
             end.makeEnd()
             start.makeStart()
             return
 
         # Otherwise, for each neighbor
         for n in current.neighbors:
+            if isMaze and hitsWall(grid, current, n):
+                continue
+
             # If the temp gScore (distance to this node from root from this path)
             # is better than the best, update it and its F score
             # Otherwise do nothing to this neighbor.
@@ -153,7 +189,6 @@ def aStarSearch(grid, start, end, draw):
                 parent[n] = current
                 gScore[n] = gScoreTemp
                 fScore[n] = gScoreTemp + hScore(n.getPosition(), end.getPosition())
-
                 if n not in visited:
                     count += 1
                     openSet.put((fScore[n], count, n))
@@ -162,63 +197,8 @@ def aStarSearch(grid, start, end, draw):
 
         # Live drawing, uncomment for better performance
         draw()
-
-
-"""MAZE PATH FINDING ALGORITHMS SECTION"""
-
-
-"""
-Solves the maze by searching breadth first, guarantees shortest path.
-
-grid --> Grid object
-start --> Spot object = DEFAULTING to top left corner
-end --> Spot object = DEFAULTING to bottom right corner
-draw --> draw() function object
-"""
-def solveMazeBFS(grid, start, end, draw):
-    # Defaulting start and end
-    start = grid.grid[0][0]
-    end = grid.grid[grid.rows - 1][grid.rows - 1]
-    start.makeStart()
-    end.makeEnd()
-
-    queue = deque([])                   # FIFO - join queue from appendright
-    queue.append(start)     
-
-    visited = set()                     # Only process !visited nodes
-    parent = dict()                     # parent[node] = where the node came from
-
-    while queue:
-        current = queue.popleft()       # Grab the next spot in line to be processed
-        visited.add(current)            # Make sure it is not visited again
-        
-        # In the event it is not start or end - make it negative
-        if current != start and current != end:
-            current.makeClosed()
-
-        # If it is the end, then draw the path and break out.
-        elif current == end:
-            path = getPath(start, end, parent)
-            for p in path:
-                p.makePath()
-
-            end.makeEnd()
-            start.makeStart()
-            break
-        
-        # Then, add all valid neighbors (unvisited ones) to the queue to be processed.
-        # Notice we add them to visited, so that the BFS algorithm doesn't overlap
-        for n in current.neighbors:
-            # If unvisited and doesn't cross a wall when you get to it.
-            if n not in visited and not hitsWall(grid, current, n):
-                n.makeOpen()
-                queue.append(n)
-                visited.add(n)
-                parent[n] = current
-
-        # Draw for live performance
-        draw()
-
+        pygame.display.update()
+    
 
 """
 Solves the maze by searching with A* , guarantees shortest path.
@@ -263,6 +243,7 @@ def solveMazeAStar(grid, start, end, draw):
             for p in path:
                 p.makePath()
                 draw()
+                pygame.display.update()
             end.makeEnd()
             start.makeStart()
             return
@@ -290,6 +271,8 @@ def solveMazeAStar(grid, start, end, draw):
                     n.makeOpen()
 
         draw()
+        pygame.display.update()
+    
     
 
 """ HELPER SUPPORT FUNCTIONS BELOW """
@@ -357,6 +340,15 @@ def hitsWall(grid, initial, final) -> bool:
     
     else:
         return False
+
+
+def checkMaze(grid):
+    for row in grid.gridlines:
+        for tile in row:
+            if tile["drawX"] == False or tile["drawY"] == False:
+                return True
+    
+    return False
 
     
 

@@ -15,7 +15,7 @@ def randomUnvisitedNeighbor(spot) -> Spot:
 """
 Generates a random maze given a grid object
 """
-def randomDFSMaze(grid, start, end, draw):
+def DFSMaze(grid, start, end, draw):
     last = Spot(None, -1, 0, 1, 1)
     grid.fillGridLines()
     start = grid.grid[0][0]
@@ -57,19 +57,42 @@ def randomDFSMaze(grid, start, end, draw):
         
         last = vertex
         draw()
+        pygame.display.update()
     
-    grid.clearAll()
+    grid.clearWorking()
     # draw() 
   
-def randomBT(grid, start, end, draw):
+def BTMaze(grid, start, end, draw):
     grid.fillGridLines()
     for y in range(grid.rows):
         for x in range(grid.rows):
-            carveWest = random.choice([True, False])
-            carveNorth = not carveWest
+
+            if x == 0 and y == 0:
+                carveWest = True
+                carveNorth = True
+
+            elif x == 0:
+                carveWest = True
+                carveNorth = False
+
+            elif y == 0:
+                carveNorth = True
+                carveWest = False
+            
+            else:
+                carveWest = random.choice([True, False])
+                carveNorth = not carveWest
+
             grid.gridlines[y][x]["drawY"] = carveWest
             grid.gridlines[y][x]["drawX"] = carveNorth
+            
+            if not grid.grid[x][y].isStart() and not grid.grid[x][y].isEnd():
+                grid.grid[x][y].makeClosed()
+
             draw()
+            pygame.display.update()
+
+    grid.clearWorking()
      
 
 

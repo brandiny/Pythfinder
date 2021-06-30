@@ -1,5 +1,7 @@
 import pygame
 import Color
+import Pathfind
+import Mazegen
 from Spot import Spot
 
 class Grid:
@@ -11,10 +13,18 @@ class Grid:
         self.gap  = width // rows
         self.rows = rows
         self.width = width
+
+        self.start = None
+        self.end = None
+
         self.grid = []
         self.fillGrid()
+
         self.gridlines = []
         self.fillGridLines()
+        
+        self.pathfindFunction = Pathfind.breadthFirstSearch
+        self.mazegenFunction = Mazegen.BTMaze
         
     """
     Remake the self.gridlines
@@ -65,8 +75,7 @@ class Grid:
                     pygame.draw.line(self.win, Color.GREY, (x * self.gap, y * self.gap), (x * self.gap, (y + 1) * self.gap))
 
        
-        # Update - move to main eventually
-        pygame.display.update()
+        
 
     """
     Clear the green/red on the grid (algorithm working)
@@ -90,9 +99,25 @@ class Grid:
     Clears all spots --> white
     """
     def clearAll(self):
+        self.end, self.start = None, None
         for row in self.grid:
             for spot in row:
                 spot.reset();
+
+    """
+    Clears all barriers
+    """
+    def clearBarriers(self):
+        for row in self.grid:
+            for spot in row:
+                if spot.isBarrier():
+                    spot.reset()
+    """
+    Clears all mazeLines --> white
+    """
+    def clearAllMaze(self):
+        self.fillGridLines
+        
 
     """
     Returns the R, C --> given X, Y
@@ -126,3 +151,29 @@ class Grid:
         
         print("Efficiency: " + str(round(100 * totalPath / (totalRed + totalPath))) + "%")
     
+    """
+    Runs the path finding function, after clearing working
+    """
+    def findPath(self):
+        self.clearWorking()
+        self.updateSpotNeighbors()
+        self.pathfindFunction(self, self.start, self.end, lambda : self.draw())
+
+    def makeMaze(self):
+        self.clearWorking()
+        self.updateSpotNeighbors
+        self.mazegenFunction(self, self.start, self.end, lambda : self.draw())
+    
+    def makeStart(self, spot):
+        spot.makeStart()
+        self.start = spot
+
+    def makeEnd(self, spot):
+        spot.makeEnd()
+        self.end = spot
+
+    def setPathfindFunction(self, func):
+        self.pathfindFunction = func
+
+    def setMazegenFunction(self, func):
+        self.mazegenFunction = func

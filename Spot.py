@@ -19,63 +19,60 @@ class Spot:
         self.cost = 0
         self.weight = 0
 
+        self.closedColor = Color.RED
+        self.openColor = Color.GREEN
+        self.pathColor = Color.PURPLE
+        self.barrierColor = Color.BLACK
+        self.startColor = Color.ORANGE
+        self.endColor = Color.TURQUOISE
+        self.resetColor = Color.WHITE
+
+
     """
     Returns the row, col position as an unpackable tuple (row, col)
     """
     def getPosition(self):
         return self.row, self.col
 
-    """ Is the spot visited? """
     def isClosed(self):
-        return self.color == Color.RED
+        return self.color == self.closedColor
 
-    """ Is the spot unvisited? """
     def isOpen(self):
-        return self.color == Color.GREEN
+        return self.color == self.openColor
 
-    """ Is the spot a path? """
     def isPath(self):
-        return self.color == Color.PURPLE
-    
-    """ Is the spot a barrier? """
+        return self.color == self.pathColor
+
     def isBarrier(self):
-        return self.color == Color.BLACK
+        return self.color == self.barrierColor
 
-    """ Is the spot the start? """
     def isStart(self):
-        return self.color == Color.ORANGE
+        return self.color == self.startColor
 
-    """ Is the spot unvisited? """
     def isEnd(self):
-        return self.color == Color.TURQUOISE
+        return self.color == self.endColor
 
-    """ Reset the square to white? """
     def reset(self):
-        self.color = Color.WHITE
+        self.color = self.resetColor
 
-    """ Make the spot to be visited """
     def makeOpen(self):
-        self.color = Color.GREEN
+        self.color = self.openColor
     
-    """ Make the spot already visited """
     def makeClosed(self):
-        self.color = Color.RED
+        self.color = self.closedColor
 
-    """ Make the spot to be visited """
     def makeBarrier(self):
-        self.color = Color.BLACK
+        self.color = self.barrierColor
 
-    """ Make the spot to be start """
     def makeStart(self):
-        self.color = Color.ORANGE
+        self.color = self.startColor
 
-    """ Make the spot to be end """
     def makeEnd(self):
-        self.color = Color.TURQUOISE
+        self.color = self.endColor
 
-    """ Make the spot to be final path """
     def makePath(self):
-        self.color = Color.PURPLE
+        self.color = self.pathColor
+
 
     """ Make the spot a particular color """
     def setColor(self, colortuple):
@@ -87,7 +84,6 @@ class Spot:
     def draw(self):
         pygame.draw.rect(self.win, self.color, (self.x, self.y, self.width, self.width))
         
-
     """
     Updates the square's neighbors field, so that the VALID neighbors are added.
     INVALID neighbors = out of bounds, or barriers
