@@ -16,16 +16,15 @@ def randomUnvisitedNeighbor(spot) -> Spot:
 Generates a random maze given a grid object
 """
 def DFSMaze(grid, start, end, draw):
-    last = Spot(None, -1, 0, 1, 1)
     grid.fillGridLines()
     start = grid.grid[0][0]
-
+    last = Spot(None, -1, 0, 1, 1)
+    
     stack = [start]
     while stack:
         vertex = stack[-1]
         vertex.makeClosed()
         next = randomUnvisitedNeighbor(vertex)
-        
         # If no more neighbors, end this vertex
         if next == None:
             stack.pop()
@@ -60,7 +59,7 @@ def DFSMaze(grid, start, end, draw):
         pygame.display.update()
     
     grid.clearWorking()
-    # draw() 
+
   
 def BTMaze(grid, start, end, draw):
     grid.fillGridLines()

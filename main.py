@@ -53,12 +53,7 @@ def handleEvents():
                     grid.makeEnd(spot)
 
                 elif spot != grid.end and spot != grid.start:
-                    spot.makeBarrier()
-
-                    # spot.weight += 1
-                    # weight = spot.weight
-                    # r, g, b = 255, 255, 255
-                    # r, g, b = max(0, r - weight*20), max(0, g - weight*20), max(0, b - weight*20)
+                    grid.makeBarrier(spot)
             
             # Otherwise the click lands within the control region
             controls.handleClick(x, y)

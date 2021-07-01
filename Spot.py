@@ -16,7 +16,6 @@ class Spot:
         self.color = Color.WHITE        # Default spot color
         self.neighbors = []             # List of nearby Spot objects
 
-        self.cost = 0
         self.weight = 0
 
         self.closedColor = Color.RED
@@ -27,6 +26,7 @@ class Spot:
         self.endColor = Color.TURQUOISE
         self.resetColor = Color.WHITE
 
+   
 
     """
     Returns the row, col position as an unpackable tuple (row, col)
@@ -44,7 +44,7 @@ class Spot:
         return self.color == self.pathColor
 
     def isBarrier(self):
-        return self.color == self.barrierColor
+        return self.color == self.barrierColor or self.weight != 0
 
     def isStart(self):
         return self.color == self.startColor
@@ -54,6 +54,7 @@ class Spot:
 
     def reset(self):
         self.color = self.resetColor
+        self.weight = 0
 
     def makeOpen(self):
         self.color = self.openColor
@@ -112,7 +113,7 @@ class Spot:
     Less than function, 
     """
     def __lt__(self, other):
-        return self.cost < other.cost
+        return self.weight < other.weight
 
         
 

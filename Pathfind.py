@@ -1,6 +1,8 @@
 import pygame
+import heapq
 from queue import PriorityQueue
 from collections import deque
+import Color
 
 """PATH FINDING ALGORITHMS SECTION"""
 
@@ -200,80 +202,53 @@ def aStarSearch(grid, start, end, draw):
         pygame.display.update()
     
 
-"""
-Solves the maze by searching with A* , guarantees shortest path.
 
-grid --> Grid object
-start --> Spot object = DEFAULTING to top left corner
-end --> Spot object = DEFAULTING to bottom right corner
-draw --> draw() function object
-"""
-def solveMazeAStar(grid, start, end, draw):
-    count = 0                           # Used for breaking ties where F score is    
-    openSet = PriorityQueue()           # Priority Queue based on first element of tuple
-    openSet.put((0, count, start))      # (FScore, Tiebreak_count, spot object)
-    parent = {}                         # parent[spot] = where spot came from (returns spot)
+def dijkstraSearch(grid, start, end, draw):
+    dist = {spot: float('inf') for row in grid.grid for spot in row}
+    dist[start] = 0
 
-    # G Score = the SHORTEST known distance to arrive at given spot from start
-    # gScore[start] = 0, as it is already at start
-    # Initialise all other G Scores at infinity because we don't know the path yet
-    gScore = {spot: float('inf') for row in grid.grid for spot in row}
-    gScore[start] = 0
+    parent = dict()
+    visited = set([start])
 
-    # F Score = G Score + H Score
-    # H Score = 'estimated' distance to the end node from the current node with heuristic
-    # Therefore F score is total cost to arrive at end.
-    fScore = {spot: float('inf') for row in grid.grid for spot in row}
-    fScore[start] = hScore(start.getPosition(), end.getPosition())
+    queue = [(dist[spot], spot) for row in grid.grid for spot in row]
+    heapq.heapify(queue)
 
-    visited = {start}                   # Tracks whether spots have been visited    
-
-   
-    while not openSet.empty():
-        current = openSet.get()[2]
-        visited.remove(current)
+    while len(queue):
+        current = heapq.heappop(queue)[1]
+        visited.add(current)
 
         # If it is not equal to the end, we make it closed
         if current != start and current != end:
             current.makeClosed()
 
-        # If we find the end, reconstruct the path and exit
-        elif current == end:
-            path = getPath(start, end, parent)
-            for p in path:
-                p.makePath()
-                draw()
-                pygame.display.update()
-            end.makeEnd()
-            start.makeStart()
-            return
-
-        # Otherwise, for each neighbor
         for n in current.neighbors:
-            # If the neighbor is blocked by a wall, do nothing
-            if hitsWall(grid, current, n):
-                continue
-
-            # Otherwise If the temp gScore (distance to this node from root from this path)
-            # is better than the best, update it and its F score
-            # Otherwise do nothing to this neighbor.
-            # Make sure it is unvisited too
-            gScoreTemp = gScore[current] + 1
-            if (gScoreTemp < gScore[n]):
-                parent[n] = current
-                gScore[n] = gScoreTemp
-                fScore[n] = gScoreTemp + hScore(n.getPosition(), end.getPosition())
-
-                if n not in visited:
-                    count += 1
-                    openSet.put((fScore[n], count, n))
-                    visited.add(n)
-                    n.makeOpen()
-
+            if n not in visited:
+                distance_to = dist[current] + n.weight
+                if distance_to < dist[n]:
+                    parent[n] = current
+                    dist[n] = distance_to
+                    if n.color == Color.WHITE:
+                        n.makeOpen()
+                    
+        while len(queue):
+            heapq.heappop(queue)
+            
+        queue = [(dist[spot], spot) for row in grid.grid for spot in row if spot not in visited]
+        heapq.heapify(queue)
+            
+        # Live drawing, uncomment for better performance
         draw()
         pygame.display.update()
-    
-    
+
+    path = getPath(start, end, parent)
+    for p in path:
+        p.makePath()
+        draw()
+        pygame.display.update()
+    end.makeEnd()
+    start.makeStart()
+    return
+
 
 """ HELPER SUPPORT FUNCTIONS BELOW """
 
@@ -295,6 +270,7 @@ def getPath(start, end, parentDictionary) -> list:
         pointer = parentDictionary[pointer]
     
     # List is reversed because we add it in reverse order.
+    print("Path length: ", len(path))
     return path[::-1] 
     
 

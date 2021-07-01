@@ -25,7 +25,9 @@ class Grid:
         
         self.pathfindFunction = Pathfind.breadthFirstSearch
         self.mazegenFunction = Mazegen.BTMaze
-        
+
+        self.drawWeighted = True
+
     """
     Remake the self.gridlines
     """ 
@@ -96,6 +98,12 @@ class Grid:
                     spot.reset()
 
     """
+    Clear maze
+    """
+    def clearMaze(self):
+        self.fillGridLines()
+
+    """
     Clears all spots --> white
     """
     def clearAll(self):
@@ -103,6 +111,8 @@ class Grid:
         for row in self.grid:
             for spot in row:
                 spot.reset();
+
+        self.clearMaze()
 
     """
     Clears all barriers
@@ -161,7 +171,7 @@ class Grid:
 
     def makeMaze(self):
         self.clearWorking()
-        self.updateSpotNeighbors
+        self.updateSpotNeighbors()
         self.mazegenFunction(self, self.start, self.end, lambda : self.draw())
     
     def makeStart(self, spot):
@@ -174,6 +184,21 @@ class Grid:
 
     def setPathfindFunction(self, func):
         self.pathfindFunction = func
+        self.findPath()
 
     def setMazegenFunction(self, func):
         self.mazegenFunction = func
+        self.makeMaze()
+    
+    def toggleDrawWeighted(self):
+        self.drawWeighted = not self.drawWeighted
+
+    def makeBarrier(self, spot):
+        if self.drawWeighted:
+            spot.weight += 1
+            weight = spot.weight
+            r, g, b = 255, 255, 255
+            r, g, b = max(0, r - weight*20), max(0, g - weight*20), max(0, b - weight*20)
+            spot.setColor((r, g, b))
+        else:
+            spot.makeBarrier()

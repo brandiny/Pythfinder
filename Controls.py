@@ -47,15 +47,17 @@ class Controls:
     Creates the GUI, fills up self.buttons
     """
     def createGUI(self) -> None:
-        self.addButton(0, 0, "Find path", Color.GREEN, lambda : self.grid.findPath())
-        self.addButton(0, 1, "Clear working", Color.YELLOW, lambda : self.grid.clearWorking())
-        self.addButton(0, 2, "Clear barriers", Color.GREEN, lambda : self.grid.clearBarriers())
+        self.addButton(0, 0, "Clear working", Color.YELLOW, lambda : self.grid.clearWorking())
+        self.addButton(0, 1, "Clear barriers", Color.GREEN, lambda : self.grid.clearBarriers())
+        self.addButton(0, 2, "Clear maze", Color.YELLOW, lambda : self.grid.clearMaze())
         self.addButton(0, 3, "Clear all", Color.YELLOW, lambda : self.grid.clearAll())
         self.addButton(1, 0, "Use BFS", Color.YELLOW, lambda : self.grid.setPathfindFunction(Pathfind.breadthFirstSearch))
         self.addButton(1, 1, "Use DFS", Color.GREEN, lambda : self.grid.setPathfindFunction(Pathfind.depthFirstSearch))
         self.addButton(1, 2, "Use A* search", Color.YELLOW, lambda : self.grid.setPathfindFunction(Pathfind.aStarSearch))
+        self.addButton(1, 3, "Dijkstra's", Color.YELLOW, lambda : self.grid.setPathfindFunction(Pathfind.dijkstraSearch))
         self.addButton(2, 0, "BT maze", Color.GREEN, lambda : self.grid.setMazegenFunction(Mazegen.BTMaze))
         self.addButton(2, 1, "DFS maze", Color.GREEN, lambda : self.grid.setMazegenFunction(Mazegen.DFSMaze))
+        self.addButton(3, 0, "Toggle draw", Color.GREEN, lambda : self.grid.toggleDrawWeighted())
 
     """
     Given an x, y position, if this x, y lands within a button, trigger that buttons function
