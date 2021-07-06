@@ -156,11 +156,10 @@ def aStarSearch(grid, start, end, draw):
     fScore[start] = hScore(start.getPosition(), end.getPosition())
 
     visited = {start}                   # Tracks whether spots have been visited    
-
    
     while not openSet.empty():
         current = openSet.get()[2]
-        visited.remove(current)
+        # visited.remove(current)
 
         # If it is not equal to the end, we make it closed
         if current != start and current != end:
@@ -248,6 +247,56 @@ def dijkstraSearch(grid, start, end, draw):
     end.makeEnd()
     start.makeStart()
     return
+
+def greedyBestFirstSearch(grid, start, end, draw):
+    isMaze = checkMaze(grid)            # Check if is maze
+    if start == None or end == None:    # Makes sure you can't accidentally call it
+        return
+    
+    queue = PriorityQueue()                   # Processes nodes in a FIFO manner
+    queue.put((0, start))     
+
+    visited = set()                     # Only process !visited nodes
+    parent = dict()                     # parent[node] = where the node came from
+
+    while not queue.empty():
+        current = queue.get()[1]       # Grab the next spot in line to be processed
+        visited.add(current)            # Mark as visited
+        
+        # In the event it is not start or end - make closed (nothing is there)
+        if current != start and current != end:
+            current.makeClosed()
+
+        # If it is the end, then draw the path and break out.
+        elif current == end:
+            path = getPath(start, end, parent)
+            for p in path:
+                p.makePath()
+            end.makeEnd()
+            start.makeStart()
+            return
+            
+        # Then, add all valid neighbors (unvisited ones) to the queue to be processed.
+        # Notice we add them to visited, so that the BFS algorithm doesn't overlap
+        for n in current.neighbors:
+                if isMaze:
+                    if n not in visited and not hitsWall(grid, current, n):
+                        if n != end:
+                            n.makeOpen()
+                        queue.put((hScore(n.getPosition(), end.getPosition()), n))
+                        visited.add(n)          
+                        parent[n] = current
+                else:
+                    if n not in visited:
+                        if n != end:
+                            n.makeOpen()
+                        queue.put((hScore(n.getPosition(), end.getPosition()), n))
+                        visited.add(n)          
+                        parent[n] = current
+        
+        # Redraw - comment out for performance - uncomment for interactive
+        draw()
+        pygame.display.update()
 
 
 """ HELPER SUPPORT FUNCTIONS BELOW """

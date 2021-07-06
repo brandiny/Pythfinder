@@ -26,7 +26,7 @@ class Grid:
         self.pathfindFunction = Pathfind.breadthFirstSearch
         self.mazegenFunction = Mazegen.BTMaze
 
-        self.drawWeighted = True
+        self.drawWeighted = False
 
     """
     Remake the self.gridlines

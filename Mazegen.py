@@ -16,6 +16,7 @@ def randomUnvisitedNeighbor(spot) -> Spot:
 Generates a random maze given a grid object
 """
 def DFSMaze(grid, start, end, draw):
+    grid.updateSpotNeighbors()
     grid.fillGridLines()
     start = grid.grid[0][0]
     last = Spot(None, -1, 0, 1, 1)
@@ -93,6 +94,103 @@ def BTMaze(grid, start, end, draw):
 
     grid.clearWorking()
      
+
+def sidewinderMaze(grid, start, end, draw):
+    grid.fillGridLines()
+
+    # Carve out top passage
+    for i in range(1, len(grid.gridlines[0])):
+        grid.gridlines[0][i]["drawY"] = False
+
+    for i in range(1, len(grid.gridlines)):
+        run = set()
+        for j in range(len(grid.gridlines[i])):
+            
+            run.add((i, j))
+            grid.grid[j][i].makeOpen()
+            carveEast = random.choice([True, False])
+
+            draw()
+            pygame.display.update()
+
+            if carveEast:
+                if j != len(grid.gridlines[i]) - 1:
+                    grid.gridlines[i][j+1]["drawY"] = False
+                else:
+                    grid.gridlines[i][j]["drawX"] = False
+                    i, j = random.choice(list(run))
+                    for tup in list(run):
+                        row, col = tup
+                        grid.grid[col][row].reset()
+
+            else:
+                i, j = random.choice(list(run))
+                for tup in list(run):
+                    row, col = tup
+                    grid.grid[col][row].reset()
+
+                grid.gridlines[i][j]["drawX"] = False
+                run.clear()
+            
+            
+            
+def primsAlgorithmMaze(grid, start, end, draw):
+    grid.fillGridLines()
+    grid.updateSpotNeighbors()
+    
+    # Stores the edge of the maze variables - starts with random variable
+    initial = grid.grid[random.randint(0, len(grid.grid) - 1)][random.randint(0, len(grid.grid) - 1)]
+    frontier = [initial]
+    
+    # When this is full we done
+    visited = set([initial])
+
+    # In maze
+    maze = set()
+
+    while frontier:
+        # Choose random frontier value
+        current = random.choice(frontier)
+        current.makeClosed()
+
+        frontier.remove(current)
+        maze.add(current)
+
+        # Add neighbors to frontier
+        random.shuffle(current.neighbors)
+        for n in current.neighbors:
+            if n not in visited:
+                connectCells(grid, current, n)
+                frontier.append(n)
+                n.makeOpen()
+                visited.add(n)
+    
+        # Redraw the graphics pane
+        draw()
+        pygame.display.update()
+    
+
+    # Clear all of the working
+    grid.clearWorking()
+    draw()
+    pygame.display.update()
+
+def connectCells(grid, cell1, cell2):
+    x1, y1 = cell1.getPosition()
+    x2, y2 = cell2.getPosition()
+
+    if x2 - x1 == 1 and y2 - y1 == 0: # Right
+        grid.gridlines[y2][x2]["drawY"] = False
+        
+    elif x2 - x1 == -1 and y2 - y1 == 0: # Left
+        grid.gridlines[y1][x1]["drawY"] = False
+        
+    elif x2 - x1 == 0 and y2 - y1 == 1: # Down
+        grid.gridlines[y2][x2]["drawX"] = False
+        
+    elif x2 - x1 == 0 and y2 - y1 == -1: #Up
+        grid.gridlines[y1][x1]["drawX"] = False
+        
 
 
 def getPath(start, end, parentDictionary):
