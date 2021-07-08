@@ -16,7 +16,7 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 # Program Constants
 CONTROL_PANEL_HEIGHT = 140
 WIDTH  = 500
-ROWS =  50
+ROWS =  25
 WINDOW = pygame.display.set_mode((WIDTH, WIDTH + CONTROL_PANEL_HEIGHT))
 
 # Dynamic variables

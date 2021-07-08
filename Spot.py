@@ -26,6 +26,10 @@ class Spot:
         self.endColor = Color.TURQUOISE
         self.resetColor = Color.WHITE
 
+        self.left = False
+        self.right = False
+        self.up = False
+        self.down = False
    
 
     """
@@ -71,8 +75,15 @@ class Spot:
     def makeEnd(self):
         self.color = self.endColor
 
-    def makePath(self):
-        self.color = self.pathColor
+    def makePath(self, left=False, right=False, up=False, down=False):
+        if not left and not right and not up and not down:
+            self.color = self.pathColor
+        else:
+            self.left = left
+            self.right = right
+            self.up = up
+            self.down = down
+            self.color = self.resetColor
 
 
     """ Make the spot a particular color """
@@ -84,6 +95,16 @@ class Spot:
     """
     def draw(self):
         pygame.draw.rect(self.win, self.color, (self.x, self.y, self.width, self.width))
+
+        # Draw the skinny path
+        if self.left:
+            pass
+        if self.right:
+            pass
+        if self.up:
+            pass
+        if self.down:
+            pass
         
     """
     Updates the square's neighbors field, so that the VALID neighbors are added.
